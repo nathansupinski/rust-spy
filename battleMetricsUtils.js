@@ -1,7 +1,8 @@
+import 'dotenv/config';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 
 export const getPlayerStringStatus = async (playerId) =>{
-    const serverId = '11851766'
+    const serverId = process.env.RUST_SERVER_ID
     const battlemetricsUrl = `https://api.battlemetrics.com/players/${playerId}/servers/${serverId}`
     const bmRes = await fetch(battlemetricsUrl);
     const bmData = await bmRes.json();
@@ -34,11 +35,12 @@ export const getPlayerName = async (playerId) => {
 }
 
 export const spyOnPlayer = async (record, client) => {
+    const channelId = process.env.DISCORD_NOTIFICATION_CHANNEL_ID
     const status = await updateSpyStatus(record)
     
     if(status.statusChanged){
         console.log(`STATUS CHANGE: ${status.message}`)
-        client.channels.cache.get('790360738270806016').send(status.message);
+        client.channels.cache.get(channelId).send(status.message);
     } else {
         console.log(`${status.message}`)
     }
@@ -47,7 +49,7 @@ export const spyOnPlayer = async (record, client) => {
 export const updateSpyStatus = async (record) => {
     const { playerId, lastSeen, online, name, } = record
 
-    const serverId = '11851766'
+    const serverId = process.env.RUST_SERVER_ID
     const battlemetricsUrl = `https://api.battlemetrics.com/players/${playerId}/servers/${serverId}`
     const bmRes = await fetch(battlemetricsUrl);
     const bmData = await bmRes.json();
